@@ -7,4 +7,7 @@
   #define LAUNCHER_API __declspec(dllimport)
 #endif
 
-LAUNCHER_API void launch_modules();
+extern "C"
+{
+  LAUNCHER_API void launch_modules();
+}

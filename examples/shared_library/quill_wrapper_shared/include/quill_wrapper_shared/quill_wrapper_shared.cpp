@@ -25,4 +25,4 @@ void setup_quill()
     quill::ClockSourceType::System);
 }
 
-quill::Logger* get_global_logger_a() { return global_logger_a; }
+void stop_quill() { quill::Backend::stop(); }

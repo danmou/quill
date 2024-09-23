@@ -17,7 +17,6 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clan
     target_compile_options(${LIB_NAME} PRIVATE -fvisibility=hidden)
 endif ()
 
-
 target_compile_definitions(${LIB_NAME} PRIVATE QUILL_DLL_IMPORT BUILD_TEST_MODULE_DLL)
 
 target_link_libraries(${LIB_NAME} PUBLIC quill_wrapper_shared)

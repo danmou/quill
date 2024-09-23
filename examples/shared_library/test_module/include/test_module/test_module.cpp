@@ -5,4 +5,7 @@
 
 QUILL_EXPORT extern quill::Logger* global_logger_a;
 
-void run_test_module() { LOG_INFO(global_logger_a, "TestModule is running"); }
+extern "C"
+{
+  void run_test_module() { LOG_INFO(global_logger_a, "TestModule is running"); }
+}

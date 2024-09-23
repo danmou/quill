@@ -6,5 +6,5 @@
 extern "C"
 {
   QUILL_EXPORT void setup_quill();
-  QUILL_EXPORT quill::Logger* get_global_logger_a();
+  QUILL_EXPORT void stop_quill();
 }

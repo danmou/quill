@@ -23,3 +23,5 @@ void setup_quill()
                                           "LOG_%(log_level:<9) %(logger:<12) %(message)",
                                    "%H:%M:%S.%Qns", quill::Timezone::GmtTime});
 }
+
+quill::Logger* get_global_logger_a() { return global_logger_a; }

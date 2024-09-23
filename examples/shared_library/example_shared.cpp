@@ -1,40 +1,48 @@
-#include "quill_wrapper_shared/quill_wrapper_shared.h"
-
 #include "quill/Frontend.h"
 #include "quill/LogMacros.h"
 #include "quill/Logger.h"
+#include "quill_wrapper_shared/quill_wrapper_shared.h"
 
 #include <iostream>
 #include <string>
 #include <string_view>
+#include <windows.h>
 
-/**
- * @brief Example of building Quill as a shared library.
- *
- * To build Quill as a shared library on Windows, follow these steps:
- * - Ensure the `QUILL_DLL_EXPORT` and `QUILL_DLL_IMPORT` flags are set as required
- * - You also need to set the CMake option: `-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE`
- */
-QUILL_EXPORT extern quill::Logger* global_logger_a;
+// Typedefs for the functions to load from the DLL
+typedef void (*SetupQuillFunc)();
+typedef quill::Logger* (*GetGlobalLoggerFunc)();
 
 int main()
 {
+  // Load the DLL
+  HMODULE hLib = LoadLibrary("quill_wrapper_shared.dll");
+  if (!hLib)
+  {
+    std::cerr << "Failed to load the DLL!" << std::endl;
+    return 1;
+  }
+
+  // Get the function addresses
+  SetupQuillFunc setup_quill = (SetupQuillFunc)GetProcAddress(hLib, "setup_quill");
+  GetGlobalLoggerFunc get_global_logger =
+    (GetGlobalLoggerFunc)GetProcAddress(hLib, "get_global_logger_a");
+
+  if (!setup_quill || !get_global_logger)
+  {
+    std::cerr << "Failed to get function addresses!" << std::endl;
+    FreeLibrary(hLib);
+    return 1;
+  }
+
+  // Call the setup function
   setup_quill();
 
-  // Change the LogLevel to print everything
-  global_logger_a->set_log_level(quill::LogLevel::TraceL3);
+  // Get the global logger
+  quill::Logger* global_logger_a = get_global_logger();
 
-  std::string s {"string"};
-  std::string_view sv {"string_view"};
+  std::string s{"string"};
 
-  LOG_TRACE_L3(global_logger_a, "This is a log trace l3 example {}", 1);
-  LOG_TRACE_L2(global_logger_a, "This is a log trace l2 example {} {}", 2, 2.3);
-  LOG_TRACE_L1(global_logger_a, "This is a log trace l1 {} example", "s");
-  LOG_DEBUG(global_logger_a, "This is a log debug example {}", 4);
   LOG_INFO(global_logger_a, "This is a log info example {}", s);
-  LOG_WARNING(global_logger_a, "This is a log warning example {}", sv);
-  LOG_ERROR(global_logger_a, "This is a log error example {}", 7);
-  LOG_CRITICAL(global_logger_a, "This is a log critical example {}", 118);
 
-  global_logger_a->flush_log();
+  FreeLibrary(hLib);
 }
